@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="AlienFx.Api.Test/AlienFx.Api.Test.csproj" />
+  <Project Path="AlienFx.Api/AlienFx.Api.csproj" />
+</Solution>

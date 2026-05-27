@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Product>AlienFx.Api</Product>
+    <Description>A .NET API client for controlling AlienFX lighting zones on Alienware devices.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/panoramicdata/AlienFx.Api</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/panoramicdata/AlienFx.Api</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>alienfx;alienware;lighting;hid;keyboard;rgb</PackageTags>
+    <PackageReleaseNotes>See PLAN.md and repository history for current release scope.</PackageReleaseNotes>
+    <LangVersion>latest</LangVersion>
+    <WarningsNotAsErrors>NU1605;VSSpell001</WarningsNotAsErrors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)../artifacts</PackageOutputPath>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageId>AlienFx.Api</PackageId>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;VSSpell001</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="HidSharp" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>
