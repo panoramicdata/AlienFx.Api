@@ -22,3 +22,6 @@ Thumbs.db
 *.coveragexml
 _ReSharper*/
 nuget-key.txt
+[Bb]in/
+[Oo]bj/
+.vs/
