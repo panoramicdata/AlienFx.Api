@@ -34,3 +34,4 @@ csharp_style_var_elsewhere = true:warning
 csharp_prefer_braces = true:warning
 dotnet_sort_system_directives_first = true:warning
 csharp_new_line_before_open_brace = all
+csharp_style_namespace_declarations = file_scoped:error

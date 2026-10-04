@@ -1,3 +1,7 @@
+[![NuGet version](https://img.shields.io/nuget/v/AlienFx.Api.svg)](https://www.nuget.org/packages/AlienFx.Api/)
+
+[![Codacy Badge](https://app.codacy.com/project/badge/grade/AlienFx.Api)](https://app.codacy.com/gh/panoramicdata/AlienFx.Api/dashboard)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # AlienFx.Api NuGet package
