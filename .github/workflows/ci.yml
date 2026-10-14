@@ -28,7 +28,17 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test --configuration Release --no-build
+      run: dotnet test --configuration Release --no-build --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+
+    # The tests need Windows, and the Codacy reporter action is only documented for Linux, so the report
+    # is handed to the coverage-upload job below rather than uploaded from here.
+    - name: Upload coverage report
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage
+        path: '**/coverage.cobertura.xml'
+        if-no-files-found: warn
 
     - name: Pack
       run: dotnet pack --configuration Release --no-build --output ./artifacts
@@ -66,22 +76,19 @@ jobs:
     - name: Push to NuGet
       run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
-  coverage:
+  coverage-upload:
+    needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
     - name: Checkout
       uses: actions/checkout@v7
-      with:
-        fetch-depth: 0
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v6
+    - name: Download coverage report
+      uses: actions/download-artifact@v8
       with:
-        dotnet-version: 10.0.x
-
-    - name: Run tests with coverage
-      run: dotnet test --project AlienFx.Api.Test/AlienFx.Api.Test.csproj --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+        name: coverage
+        path: ./coverage
 
     - name: Upload coverage to Codacy
       continue-on-error: true
