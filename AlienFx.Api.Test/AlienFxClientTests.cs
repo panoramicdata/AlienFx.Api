@@ -39,11 +39,61 @@ public sealed class AlienFxClientTests
 		Assert.True(transport.ApplyCalls > 0);
 	}
 
+	[Fact]
+	public void Constructor_NullOptions_ThrowsArgumentNull()
+	{
+		Assert.Throws<ArgumentNullException>(() => new AlienFxClient(null!, new FakeTransport()));
+	}
+
+	[Fact]
+	public void Constructor_NullTransport_ThrowsArgumentNull()
+	{
+		Assert.Throws<ArgumentNullException>(() => new AlienFxClient(new AlienFxClientOptions(), null!));
+	}
+
+	[Fact]
+	public async Task SetProfileAsync_ByName_UnknownName_ThrowsKeyNotFound()
+	{
+		var transport = new FakeTransport();
+		var client = new AlienFxClient(new AlienFxClientOptions(), transport);
+
+		await Assert.ThrowsAsync<KeyNotFoundException>(() => client.SetProfileAsync("DoesNotExist", CancellationToken.None));
+	}
+
+	[Fact]
+	public async Task SetProfileAsync_ByName_BlankName_ThrowsArgument()
+	{
+		var transport = new FakeTransport();
+		var client = new AlienFxClient(new AlienFxClientOptions(), transport);
+
+		await Assert.ThrowsAsync<ArgumentException>(() => client.SetProfileAsync("   ", CancellationToken.None));
+	}
+
+	[Fact]
+	public async Task SetProfileAsync_NullProfile_ThrowsArgumentNull()
+	{
+		var transport = new FakeTransport();
+		var client = new AlienFxClient(new AlienFxClientOptions(), transport);
+
+		await Assert.ThrowsAsync<ArgumentNullException>(() => client.SetProfileAsync((AlienFxProfile)null!, CancellationToken.None));
+	}
+
+	[Fact]
+	public async Task DisposeAsync_ReleasesTransport()
+	{
+		var transport = new FakeTransport();
+		var client = new AlienFxClient(new AlienFxClientOptions(), transport);
+
+		await client.DisposeAsync();
+		Assert.True(transport.Disposed);
+	}
+
 	private sealed class FakeTransport : IAlienFxTransport
 	{
 		public int EnsureConnectedCalls { get; private set; }
 		public int SetColorCalls { get; private set; }
 		public int ApplyCalls { get; private set; }
+		public bool Disposed { get; private set; }
 
 		public Task EnsureConnectedAsync(CancellationToken cancellationToken)
 		{
@@ -58,7 +108,7 @@ public sealed class AlienFxClientTests
 			return Task.CompletedTask;
 		}
 
-		public Task SetColorAsync(AlienFxZone zone, AlienFxColor color, CancellationToken cancellationToken)
+		public Task SetColorAsync(AlienFxZone _, AlienFxColor color, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			SetColorCalls++;
@@ -72,6 +122,10 @@ public sealed class AlienFxClientTests
 			return Task.CompletedTask;
 		}
 
-		public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+		public ValueTask DisposeAsync()
+		{
+			Disposed = true;
+			return ValueTask.CompletedTask;
+		}
 	}
 }
