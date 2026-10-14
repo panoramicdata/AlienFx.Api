@@ -108,7 +108,7 @@ public sealed class AlienFxClientTests
 			return Task.CompletedTask;
 		}
 
-		public Task SetColorAsync(AlienFxZone _, AlienFxColor color, CancellationToken cancellationToken)
+		public Task SetColorAsync(AlienFxZone zone, AlienFxColor color, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			SetColorCalls++;
