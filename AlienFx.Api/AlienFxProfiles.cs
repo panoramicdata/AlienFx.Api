@@ -24,7 +24,9 @@ public static class AlienFxProfiles
 		PanoramicTeal,
 	];
 
-	public static AlienFxProfile AllZonesSolid(AlienFxColor color, string profileName = "AllZonesSolid")
+	public static AlienFxProfile AllZonesSolid(AlienFxColor color) => AllZonesSolid(color, "AllZonesSolid");
+
+	public static AlienFxProfile AllZonesSolid(AlienFxColor color, string profileName)
 	{
 		var map = new Dictionary<AlienFxZone, AlienFxColor>();
 		foreach (var zone in AllZones)

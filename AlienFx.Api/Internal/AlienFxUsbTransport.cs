@@ -17,64 +17,99 @@ internal sealed class AlienFxUsbTransport : IAlienFxTransport
 	{
 		cancellationToken.ThrowIfCancellationRequested();
 
-		if (_streams.Count > 0 && _streams.All(s => s.CanWrite))
+		if (HasWritableStreams())
 		{
 			return;
 		}
 
-		await Task.Run(() =>
+		await Task.Run(() => Reconnect(), cancellationToken).ConfigureAwait(false);
+	}
+
+	private bool HasWritableStreams()
+	{
+		return _streams.Count > 0 && _streams.All(s => s.CanWrite);
+	}
+
+	private void Reconnect()
+	{
+		DisposeOpenStreams();
+		_devices.Clear();
+		OpenDevices(GetVendorIdsToTry());
+		ThrowIfNoWritableDevice(GetVendorIdsToTry());
+	}
+
+	private void OpenDevices(IReadOnlyList<int> vendorIdsToTry)
+	{
+		var candidates = FindCandidates(vendorIdsToTry);
+		OpenStreams(PrioritizeDevices(candidates));
+	}
+
+	private void ThrowIfNoWritableDevice(IReadOnlyList<int> vendorIdsToTry)
+	{
+		if (_streams.Count > 0)
 		{
-			DisposeOpenStreams();
-			_devices.Clear();
+			return;
+		}
 
-			var list = DeviceList.Local;
-			var vendorIdsToTry = GetVendorIdsToTry();
-			var candidates = new List<HidDevice>();
+		if (!_options.ThrowIfDeviceNotFound)
+		{
+			return;
+		}
 
-			foreach (var vendorId in vendorIdsToTry)
+		throw new InvalidOperationException(BuildNoDeviceMessage(vendorIdsToTry));
+	}
+
+	private string BuildNoDeviceMessage(IReadOnlyList<int> vendorIdsToTry)
+	{
+		var attempted = string.Join(", ", vendorIdsToTry.Select(v => $"0x{v:X4}"));
+		return $"No writable AlienFX HID device found. Attempted vendor IDs: {attempted}. If your keyboard is AWCC Advanced KB, try VendorId 0x0D62 and ProductId 0xD2B0.";
+	}
+
+	private List<HidDevice> FindCandidates(IReadOnlyList<int> vendorIdsToTry)
+	{
+		var list = DeviceList.Local;
+		var candidates = new List<HidDevice>();
+
+		foreach (var vendorId in vendorIdsToTry)
+		{
+			var perVendor = _options.ProductId.HasValue
+				? list.GetHidDevices(vendorId, _options.ProductId.Value)
+				: list.GetHidDevices(vendorId);
+
+			candidates.AddRange(perVendor);
+		}
+
+		return candidates;
+	}
+
+	private List<HidDevice> PrioritizeDevices(List<HidDevice> candidates)
+	{
+		return candidates
+			.OrderByDescending(d => d.GetMaxOutputReportLength())
+			.Where(d => d.GetMaxOutputReportLength() >= _options.ReportLength)
+			.GroupBy(d => d.DevicePath)
+			.Select(g => g.First())
+			.ToList();
+	}
+
+	private void OpenStreams(List<HidDevice> devices)
+	{
+		foreach (var device in devices)
+		{
+			if (!device.TryOpen(out var stream) || stream is null)
 			{
-				var perVendor = _options.ProductId.HasValue
-					? list.GetHidDevices(vendorId, _options.ProductId.Value)
-					: list.GetHidDevices(vendorId);
-
-				candidates.AddRange(perVendor);
+				continue;
 			}
 
-			var prioritized = candidates
-				.OrderByDescending(d => d.GetMaxOutputReportLength())
-				.Where(d => d.GetMaxOutputReportLength() >= _options.ReportLength)
-				.GroupBy(d => d.DevicePath)
-				.Select(g => g.First())
-				.ToList();
-
-			foreach (var device in prioritized)
+			if (!stream.CanWrite)
 			{
-				if (!device.TryOpen(out var stream) || stream is null)
-				{
-					continue;
-				}
-
-				if (!stream.CanWrite)
-				{
-					stream.Dispose();
-					continue;
-				}
-
-				_devices.Add(device);
-				_streams.Add(stream);
+				stream.Dispose();
+				continue;
 			}
 
-			if (_streams.Count == 0)
-			{
-				if (_options.ThrowIfDeviceNotFound)
-				{
-					var attempted = string.Join(", ", vendorIdsToTry.Select(v => $"0x{v:X4}"));
-					throw new InvalidOperationException($"No writable AlienFX HID device found. Attempted vendor IDs: {attempted}. If your keyboard is AWCC Advanced KB, try VendorId 0x0D62 and ProductId 0xD2B0.");
-				}
-
-				return;
-			}
-		}, cancellationToken).ConfigureAwait(false);
+			_devices.Add(device);
+			_streams.Add(stream);
+		}
 	}
 
 	private IReadOnlyList<int> GetVendorIdsToTry()

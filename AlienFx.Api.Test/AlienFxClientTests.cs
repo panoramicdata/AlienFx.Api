@@ -47,20 +47,27 @@ public sealed class AlienFxClientTests
 
 		public Task EnsureConnectedAsync(CancellationToken cancellationToken)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			EnsureConnectedCalls++;
 			return Task.CompletedTask;
 		}
 
-		public Task WaitUntilReadyAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+		public Task WaitUntilReadyAsync(CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			return Task.CompletedTask;
+		}
 
 		public Task SetColorAsync(AlienFxZone zone, AlienFxColor color, CancellationToken cancellationToken)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			SetColorCalls++;
 			return Task.CompletedTask;
 		}
 
 		public Task ApplyAsync(CancellationToken cancellationToken)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			ApplyCalls++;
 			return Task.CompletedTask;
 		}
