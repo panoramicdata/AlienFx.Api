@@ -26,6 +26,14 @@ public sealed class AlienFxClientTests
 
 		Assert.True(transport.EnsureConnectedCalls > 0);
 		Assert.True(transport.SetColorCalls >= profile.ZoneColors.Count);
+
+		// The transport must receive each zone with the colour the profile gives it, not merely the right number of calls.
+		Assert.Equal(profile.ZoneColors.Count, transport.ColorsSet.Count);
+		foreach (var (zone, colour) in profile.ZoneColors)
+		{
+			Assert.Equal(colour, transport.ColorsSet[zone]);
+		}
+
 		Assert.True(transport.ApplyCalls > 0);
 	}
 
@@ -92,6 +100,7 @@ public sealed class AlienFxClientTests
 	{
 		public int EnsureConnectedCalls { get; private set; }
 		public int SetColorCalls { get; private set; }
+		public Dictionary<AlienFxZone, AlienFxColor> ColorsSet { get; } = [];
 		public int ApplyCalls { get; private set; }
 		public bool Disposed { get; private set; }
 
@@ -108,10 +117,11 @@ public sealed class AlienFxClientTests
 			return Task.CompletedTask;
 		}
 
-		public Task SetColorAsync(AlienFxZone _zone, AlienFxColor color, CancellationToken cancellationToken)
+		public Task SetColorAsync(AlienFxZone zone, AlienFxColor color, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			SetColorCalls++;
+			ColorsSet[zone] = color;
 			return Task.CompletedTask;
 		}
 
