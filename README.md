@@ -8,7 +8,9 @@
 
 [![NuGet](https://img.shields.io/nuget/v/AlienFx.Api)](https://www.nuget.org/packages/AlienFx.Api/)
 
-A .NET 10 API client for controlling AlienFX lighting zones on Alienware systems.
+A .NET 11.0 API client for controlling AlienFX lighting zones on Alienware systems.
+
+Supports .NET 11.0.
 
 ## Status
 
@@ -31,7 +33,7 @@ Install-Package AlienFx.Api
 
 ## Requirements
 
-- .NET 10 SDK/runtime.
+- .NET 11.0 SDK/runtime.
 - Windows.
 - AlienFX-capable device.
 
