@@ -1,6 +1,6 @@
 [![NuGet version](https://img.shields.io/nuget/v/AlienFx.Api.svg)](https://www.nuget.org/packages/AlienFx.Api/)
 
-[![Codacy Badge](https://app.codacy.com/project/badge/grade/AlienFx.Api)](https://app.codacy.com/gh/panoramicdata/AlienFx.Api/dashboard)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/60d8306cca884f9fb740b0c0fb4b9690)](https://app.codacy.com/gh/panoramicdata/AlienFx.Api/dashboard)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
